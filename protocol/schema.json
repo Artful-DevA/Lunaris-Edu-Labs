@@ -1,0 +1,183 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Lunaris WebSocket Protocol v0.1",
+  "description": "Initial transport contract; semantics may be extended in later milestones. Simulation state and ML predictions must be independent.",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/telemetry"
+    },
+    {
+      "$ref": "#/$defs/command"
+    },
+    {
+      "$ref": "#/$defs/command_ack"
+    }
+  ],
+  "$defs": {
+    "telemetry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "type",
+        "session_id",
+        "timestamp_ms",
+        "sequence",
+        "sensors",
+        "ai"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "0.1"
+        },
+        "type": {
+          "const": "telemetry"
+        },
+        "session_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "timestamp_ms": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "sequence": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "sensors": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "number"
+          },
+          "description": "Sensor names defined by backend e.g. cabin_temp_c, coolant_flow_lpm."
+        },
+        "ai": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "model",
+            "anomaly_score",
+            "threshold",
+            "inference_timestamp_ms"
+          ],
+          "properties": {
+            "status": {
+              "enum": [
+                "online",
+                "warming_up",
+                "offline",
+                "error"
+              ]
+            },
+            "model": {
+              "type": "string"
+            },
+            "anomaly_score": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "threshold": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "inference_timestamp_ms": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "minimum": 0
+            },
+            "activation_summary": {
+              "type": [
+                "array",
+                "null"
+              ],
+              "items": {
+                "type": "number"
+              },
+              "description": "Optional selected model activations; not a causal explanation."
+            }
+          }
+        }
+      }
+    },
+    "command": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "type",
+        "session_id",
+        "command_id",
+        "action",
+        "target"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "0.1"
+        },
+        "type": {
+          "const": "command"
+        },
+        "session_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "command_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "action": {
+          "enum": [
+            "inject_fault",
+            "repair_fault"
+          ]
+        },
+        "target": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "command_ack": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "type",
+        "session_id",
+        "command_id",
+        "accepted",
+        "message"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "0.1"
+        },
+        "type": {
+          "const": "command_ack"
+        },
+        "session_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "command_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "accepted": {
+          "type": "boolean"
+        },
+        "message": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}
