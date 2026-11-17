@@ -1,0 +1,8 @@
+{
+  "schema_version": "0.1",
+  "type": "command",
+  "session_id": "demo-001",
+  "command_id": "cmd-001",
+  "action": "inject_fault",
+  "target": "coolant_pump_a"
+}
