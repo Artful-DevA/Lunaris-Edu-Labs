@@ -1,0 +1,8 @@
+{
+  "schema_version": "0.1",
+  "type": "command_ack",
+  "session_id": "demo-001",
+  "command_id": "cmd-001",
+  "accepted": true,
+  "message": "Fault injection accepted"
+}
