@@ -1,0 +1,20 @@
+{
+  "schema_version": "0.1",
+  "type": "telemetry",
+  "session_id": "demo-001",
+  "timestamp_ms": 1794910000000,
+  "sequence": 42,
+  "sensors": {
+    "cabin_temp_c": 22.6,
+    "coolant_flow_lpm": 48.2,
+    "power_kw": 8.1
+  },
+  "ai": {
+    "status": "warming_up",
+    "model": "mamba-pending",
+    "anomaly_score": null,
+    "threshold": null,
+    "inference_timestamp_ms": null,
+    "activation_summary": null
+  }
+}
