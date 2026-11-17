@@ -1,63 +1,104 @@
-# Lunaris Edu Labs | Build Plan
+# Lunaris Edu Labs | Development Plan
 
 Updated: 2026-11-17
+Target: TKS Create, April 2027 (exact submission date to be confirmed).
 
-## Non-negotiable requirements
-- **Primary hardware:** standalone Meta Quest 3 APK. PCVR is optional, not a prerequisite.
-- **Game:** One indoor three-module habitat; internal hatches open; exterior airlock closed; no exterior gameplay in V1.
-- **Critical feature:** live telemetry, real Mamba inference scores, and genuine diagnostics, with simulator ground truth separated from ML output.
-- **Backend:** Python simulator + FastAPI WebSocket + evaluated Mamba time-series anomaly detector. Deploy to remotely hosted service. Free hosting is *not yet secured*: benchmark portable CPU inference and verify provider limitations before choosing. Do not depend on a home PC being online.
-- **Fallback:** On cloud disconnection, game stays playable but labels AI offline. Optional *explicitly labeled* replay mode must never appear to be live inference.
-- **Performance:** Quest 3 72 Hz target, verified with on-device profiling. 3D assets must be imported at consistent metric scale with separated controls and monitor surfaces.
-- **AI evaluation:** train/validation/test separated by simulation run or chronological window as appropriate; compare against Isolation Forest with fair temporal features and threshold-based baselines; report precision, recall, F1, false-alarm rate, detection delay, model latency, and limitations. Never claim Mamba's hidden state is an explanation.
+## Current decision: Unity frontend first
 
-## Phase 0 | Repository and development environment
-- [x] Create GitHub repository and README
-- [x] Establish project plan, Git ignore, shared protocol, setup instructions
-- [ ] Clone on laptop and install Unity 6 LTS + Android build modules
-- [ ] Create Unity URP project inside `unity-vr-client/`
-- [ ] Set up OpenXR + Quest controller input
-- [ ] Deploy a simple native Quest 3 APK that tracks head and controllers
+**November–December 2026:** Focus on developing and testing the standalone Quest 3 game. **Do not start implementing or training the Python/Mamba backend unless the project owner explicitly asks.** This is intentional scope control, not a technical shortcut. Revisit backend work in **January 2027**.
 
-**Exit criterion:** a small scene launches on Quest 3. No model assets required.
+**January–February 2027 (tentative):** The project owner leads the Python telemetry research, Mamba training and evaluation, with AI assistance for explanation, code review and debugging.
 
-## Phase 1 | Habitat and interaction slice
-- [ ] Import Claude's source/model exports (editable original + clean FBX/glTF + textures)
-- [ ] Verify transforms, meters, scale, normals, colliders and materials
-- [ ] Assemble Main Control, Engineering, Life Support and open internal hatches
-- [ ] Add comfortable VR locomotion (prototype specialized lunar arm motion separately)
-- [ ] One physical failure/repair control and one functioning sensor monitor
-- [ ] Confirm 72 Hz performance by profiling actual Quest build
+**March–April 2027 (tentative):** Integrate the evaluated backend with the Quest client, test networking and gameplay, finish documentation and presentation. Dates are flexible; reserve time for TKS Iterate requirements and other commitments.
 
-**Exit criterion:** player walks indoors, triggers an event, sees telemetry change, repairs it.
+## Strict codebase boundary
 
-## Phase 2 | Mamba R&D and robust backend
-- [ ] Generate labeled, physically motivated, multichannel synthetic habitat telemetry; document assumptions and fault injections
-- [ ] Implement portable Mamba model and real training pipeline
-- [ ] Train & compare Isolation Forest and threshold / temporal baselines using leakage-resistant splits
-- [ ] Benchmark CPU inference on intended cloud architecture; preserve GPU training path
-- [ ] Implement validated, versioned WebSocket protocol, per-session state, reconnect, error states
-- [ ] Provision candidate free hosting ONLY after proving inference and long-lived connections are feasible
-- [ ] Build clear provenance labeling for live AI predictions vs diagnostics vs ground truth
+```text
+Lunaris-Edu-Labs/
+├── unity-vr-client/  # standalone Unity project; Unity/C# only
+├── mamba-backend/    # independent Python project; leave unimplemented until January
+├── protocol/         # language-neutral versioned wire format; no runtime dependencies
+└── docs/
+```
 
-**Exit criterion:** real model predictions arrive via WebSocket, measured and reproducible.
+- Unity runs **without** Python, cloud services, or Mamba during the frontend-first phase.
+- Temporary telemetry comes from a small **local Unity simulation**. Label its values and diagnostics as **SIMULATED**.
+- Until real model inference is available, displays must say **AI OFFLINE / NOT CONNECTED**. Never fabricate a Mamba anomaly score and present it as real.
+- Design a replaceable data-source boundary in Unity so a future WebSocket telemetry provider can replace the local provider without rewriting monitor UI.
+- Neither runtime imports code from the other. They communicate later using `protocol/` JSON messages over WebSockets.
+- The backend is the owner's core TKS technical contribution: the owner should code meaningful portions of the simulation, training and evaluation.
+- Keep Unity assets, packages and project settings inside `unity-vr-client/`. Python environment and dependencies belong only in `mamba-backend/`.
+- At present these are **separate projects in one GitHub repository**, not separate GitHub repositories.
 
-## Phase 3 | Unity monitoring and showcase
-- [ ] Map telemetry & anomaly messages to in-world UI
-- [ ] Show real graphs, anomaly scores, timestamp, latency and fault-state diagnostics
-- [ ] Failure injection and repair send command/ack messages; validate gameplay loop
-- [ ] Optional exterior camera via RenderTexture, limited rate & device profiling
-- [ ] Finish materials, lights, sounds, tutorial, offline/connection states
-- [ ] Test repeated Quest sessions, intermittent Wi-Fi, cloud cold start & reconnection
-- [ ] Collect benchmark report, demo recording, reproducibility documentation
+## Frontend milestones (the only active development track for now)
 
-**Exit criterion:** a repeatable Quest 3 showcase with real, documented Mamba inference.
+### F0 | Clone and Quest 3 setup
+- [x] Initialize GitHub repository, documentation, gitignore and proposed protocol
+- [ ] Install Unity 6 LTS with Android SDK, NDK and OpenJDK on laptop
+- [ ] Clone repository and generate Unity URP project inside `unity-vr-client/`
+- [ ] Configure OpenXR / Quest controller input
+- [ ] Build an empty room APK and test Quest headset/controller tracking
 
-## Decisions deferred
-- Actual Unity package versions until editor project is created on laptop.
-- Mamba variant and trained checkpoint until research evaluation.
-- Oracle Cloud vs Cloud Run hosting until proof of CPU and network viability.
-- Optional PCVR, multiplayer, working keyboards, exterior exploration until after V1.
+**Done when:** standalone APK boots with correct VR tracking.
 
-## Milestone log
-- 2026-11-17: project initialized remotely in GitHub. No Unity editor project has been created or tested.
+### F1 | Walk through the lunar base
+- [ ] Import Claude's assembled reference scene and exported modules
+- [ ] Validate coordinate system, meters, room/corridor alignment, normals, materials and scale
+- [ ] Build Main Control, Engineering and Life Support scenes/prefabs
+- [ ] Add performance-conscious lighting, colliders, and comfortable movement
+- [ ] Test performance and readability in Quest 3
+
+**Done when:** player can navigate the actual indoor habitat at an acceptable on-device frame rate.
+
+### F2 | Interactive monitoring without backend
+- [ ] Implement local, deterministic simulated sensor streams with a fault-injection control
+- [ ] Display **live-updating simulated telemetry** graphs on the in-world monitors
+- [ ] Add **simulated system diagnostics** and fault/repair interactions
+- [ ] Reserve a screen for an exterior camera feed, subject to Quest performance
+- [ ] Clearly label Mamba panel as **AI NOT CONNECTED**
+- [ ] Add swappable telemetry-source interface for future server data
+- [ ] Test the event cycle on Quest: trigger failure → see graph change → inspect diagnostics → repair
+
+**Done when:** a complete self-contained VR gameplay loop works offline. This does **not** count as completed ML.
+
+### F3 | Frontend polish, only if time permits before January
+- [ ] Upgrade usability, visuals, ambient audio, user onboarding and graceful offline states
+- [ ] Prioritize one polished interactive workstation over dozens of decorative controls
+- [ ] Profile additional cameras and monitor refresh rates on real headset
+
+## Backend research (deliberately deferred)
+
+### B0 | Define real ML task and dataset
+- [ ] Specify multichannel telemetry, fault types, and assumptions
+- [ ] Author/test dataset generator, sequence windows and careful data splits
+- [ ] Establish simple, honestly evaluated threshold / temporal baselines
+
+### B1 | Implement and evaluate genuine Mamba
+- [ ] Choose a verifiable Mamba implementation, ensure CPU inference portability
+- [ ] Owner codes meaningful parts of data processing, training loop, anomaly scoring and evaluation
+- [ ] Train and evaluate without train/test leakage
+- [ ] Compare with Isolation Forest and threshold/temporal baselines
+- [ ] Report precision, recall, F1, false alarms, detection delay, and inference latency
+- [ ] Document what is simulation ground truth, what is heuristic diagnostics and what is model output
+
+### B2 | Remote inference, then integration
+- [ ] Prototype FastAPI WebSocket transport and session management
+- [ ] Benchmark resource needs before selecting a cloud host; no assumption free-tier cloud is viable
+- [ ] Keep Quest independent of the user's laptop while playing
+- [ ] Switch Unity telemetry provider from local to server data, retaining an honest offline mode
+- [ ] Display actual model score, threshold and timestamp only when supplied by trained model
+- [ ] Validate latency, dropped connections, cold starts and failure response
+
+## Scope guardrails
+
+- Standalone Quest 3 APK first; PCVR optional.
+- Interior-only three-module habitat. Internal hatches can remain open, exterior airlock closed.
+- Essential interactions: fault injection, diagnostics, repair, monitor selection.
+- Not priorities: functional keyboards/chairs, multiplayer, exterior exploration.
+- 72 Hz is a performance target that must be validated on the device, not assumed.
+- No AI-generated score should be represented as genuine Mamba inference until training and serving have been implemented and tested.
+
+## Status log
+
+- 2026-11-17: Repository foundation committed. No working Unity project/APK or trained Mamba exists yet.
+- 2026-11-17: Plan revised to Unity-first; backend explicitly paused until January 2027.
