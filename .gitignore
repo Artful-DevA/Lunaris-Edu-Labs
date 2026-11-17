@@ -1,0 +1,57 @@
+# Unity (project is at unity-vr-client/)
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+[Mm]emoryCaptures/
+[Rr]ecordings/
+*.csproj
+*.sln
+*.suo
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+*.VC.VC.opendb
+*.apk
+*.aab
+*.unitypackage
+# IDE
+.vscode/
+.idea/
+# Python / notebooks
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+.env
+.env.*
+!.env.example
+.ipynb_checkpoints/
+# datasets and checkpoints: keep metadata/manifests, not huge binary assets
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+*.onnx
+*.h5
+*.parquet
+*.npy
+*.npz
+*.zip
+*.tar
+*.tar.gz
+# OS
+.DS_Store
+Thumbs.db
